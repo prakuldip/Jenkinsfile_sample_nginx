@@ -2,7 +2,7 @@ pipeline {
     agent any 
     environment {
         registryURI = "https://registry.hub.docker.com/"
-        registry = "prakuldip/Jenkinsfile_sample_nginx"
+        registry = "prakuldip/jenkinsfile_sample_nginx"
         registryCredential = 'dockerhub_cred'
         }
 stages {
