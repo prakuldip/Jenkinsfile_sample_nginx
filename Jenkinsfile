@@ -1,32 +1,49 @@
 pipeline {
     agent any 
     environment {
-        registryURI = "https://hub.docker.com/"
-        registry = "prakuldip/kuldip_sample_nginx_jenkinsfile"
-        registryCredential = "dockerhub_cred"
-    }
+        registryURI = "https://registry.hub.docker.com/"
+        registry = "prakuldip/Jenkinsfile_sample_nginx"
+        registryCredential = 'dockerhub_cred'
+        }
 stages {
-        stage('building docker image') {
+        stage('Building image from project dir') {
             environment {
-            iamge_tag = "${env.registryURI}" + ":" + "$GIT_COMMIT"
+                registry_endpoint = "${env.registryURI}" + "${env.registry}"
+                tag_commit_id     = "${env.registry}" + ":$GIT_COMMIT"
             }
             steps{
                 script {
-                def kul_app_image = docker.build(iamge_tag)
+                def app = docker.build(tag_commit_id)
+                docker.withRegistry( registry_endpoint, registryCredential ) {
+                        app.push()
                 }
             }
         }
-        stage('pushing docker image') {
+        }
+/*        stage('Deploy Image') {
             environment {
-            registry_endpoint = "${env.registryURI}" + "${env.registry}"
+                registry_endpoint = "${env.registryURI}" + "${env.registry}"
             }
             steps{
                 script {
-                    docker.withRegistry(registry_endpoint,registryCredential){
-                        kul_app_image.push()
-                    }
-                }   
-            }
-        }   
-    } 
+                    docker.withRegistry( registry_endpoint, registryCredential ) {
+                        app.push()
+                        app.push(latest)
+                    }   
+                }
+            }   
+        }
+*/ 
+        stage('Remove Unused docker image') {
+            steps{
+                sh "docker rmi $registry:$GIT_COMMIT"
+                }
+        }
+    }
+    post { 
+        always { 
+            echo 'Deleting Workspace'
+            deleteDir() /* clean up our workspace */
+        }
+    }
 }
