@@ -16,7 +16,6 @@ stages {
                 }
             }
         }
-        }
         stage('pushing docker image') {
             environment {
             registry_endpoint = "${env.registryURI}" + "${env.registry}"
@@ -29,7 +28,5 @@ stages {
                 }   
             }
         }   
-        } 
-
-    }
+    } 
 }
